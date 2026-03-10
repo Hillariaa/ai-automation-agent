@@ -63,7 +63,7 @@ Recruiter can then schedule a call.
 
 ## Live Demo
 
-Coming soon.
+https://ai-career-agent-ui.vercel.app
 
 ---
 
