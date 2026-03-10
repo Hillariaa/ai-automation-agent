@@ -1,5 +1,13 @@
 # AI Career Automation Agent
 
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-green)
+![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Framework-purple)
+![OpenAI](https://img.shields.io/badge/OpenAI-LLM-black)
+![Next.js](https://img.shields.io/badge/Next.js-Frontend-lightgrey)
+![AI Agents](https://img.shields.io/badge/AI-Agent%20System-orange)
+![Deployment](https://img.shields.io/badge/Deployment-Render%20%7C%20Vercel-blue)
+
 AI-powered automation agent that interacts with recruiters by answering questions about my work, sharing my portfolio and CV, and helping schedule calls.
 
 ---
