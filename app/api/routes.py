@@ -8,12 +8,11 @@ router = APIRouter()
 
 class AgentRequest(BaseModel):
     message: str
-    state: str
 
 
 @router.post("/automate")
 def automate(request: AgentRequest):
 
-    result = automation_agent(request.message, request.state)
+    result = automation_agent(request.message)
 
     return result

@@ -1,41 +1,35 @@
-from app.tools.hilary_knowledge import hilary_intro, hilary_projects
-from app.tools.outreach_tools import portfolio_link, cv_link, calendly_link
+from app.tools.hilary_knowledge import hilary_intro, hilary_systems
+from app.tools.outreach_tools import (
+    portfolio_response,
+    cv_response,
+    calendly_response,
+)
 
 
-def automation_agent(message: str, state: str):
+def automation_agent(message: str):
 
-    msg = message.lower()
+    message = message.lower()
 
-    # Start conversation
-    if msg == "start":
-        return {"state": "intro", "message": hilary_intro}
+    # recruiter wants systems
 
-    # Recruiter wants to learn more
-    if msg in ["yes", "sure", "ok"]:
-        return {"state": "knowledge", "message": hilary_projects}
+    if message in ["yes", "learn", "learn more"]:
+        return hilary_systems()
 
-    # Portfolio
-    if "portfolio" in msg:
-        return {
-            "state": "portfolio",
-            "message": f"View Hilary's portfolio here:\n\n{portfolio_link}",
-        }
+    # recruiter wants portfolio
 
-    # CV
-    if "cv" in msg:
-        return {
-            "state": "cv",
-            "message": f"You can download Hilary's CV here:\n\n{cv_link}",
-        }
+    if "portfolio" in message:
+        return portfolio_response()
 
-    # Schedule
-    if "schedule" in msg or "book" in msg:
-        return {
-            "state": "schedule",
-            "message": f"Great! Schedule a call with Hilary here:\n\n{calendly_link}",
-        }
+    # recruiter wants cv
 
-    return {
-        "state": "end",
-        "message": "Thank you for exploring Hilary's work. You're welcome back anytime.",
-    }
+    if "cv" in message:
+        return cv_response()
+
+    # recruiter wants meeting
+
+    if "schedule" in message or "call" in message or "meeting" in message:
+        return calendly_response()
+
+    # default intro
+
+    return hilary_intro()
