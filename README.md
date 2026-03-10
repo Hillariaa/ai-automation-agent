@@ -1,6 +1,19 @@
 # AI Career Automation Agent
 
-An AI-powered automation agent that represents me (Hilary Azimoh) and interacts with recruiters by answering questions about my work, sharing my portfolio and CV, and helping schedule calls.
+AI-powered automation agent that interacts with recruiters by answering questions about my work, sharing my portfolio and CV, and helping schedule calls.
+
+---
+
+## Tech Stack
+
+- Python
+- FastAPI
+- LangGraph
+- OpenAI API
+- Next.js
+- TypeScript
+- AI Agents
+- Automation Workflows
 
 ## Overview
 
@@ -17,31 +30,23 @@ The system demonstrates practical AI agent design using LangGraph and LLM routin
 
 ---
 
-## Architecture
+## System Architecture
 
 Frontend  
-Next.js conversational interface
+Next.js conversational UI
 
 Backend  
-FastAPI API serving the AI agent
+FastAPI API hosting the AI agent
 
 Agent Framework  
-LangGraph state machine controlling conversation flow
+LangGraph state machine managing conversation flow
 
 AI Model  
-OpenAI GPT model
+OpenAI GPT models
 
----
-
-## Tech Stack
-
-Python  
-FastAPI  
-LangGraph  
-OpenAI API  
-Next.js  
-TypeScript  
-Docker
+Deployment  
+Render (backend)  
+Vercel (frontend)
 
 ---
 
