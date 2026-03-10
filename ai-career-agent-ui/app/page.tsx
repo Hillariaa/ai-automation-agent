@@ -12,31 +12,52 @@ export default function Home() {
 
   async function sendMessage(message: string) {
 
-    setLoading(true);
-
-    const res = await fetch("http://127.0.0.1:8001/automate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await res.json();
-
-    setTimeout(() => {
-
-      setResponse(data.message);
-      setActions(data.actions || []);
-      setLoading(false);
-
-      // smooth scroll to response
-
+    try {
+  
+      setLoading(true)
+      setResponse("")
+      setActions([])
+  
+      const res = await fetch(
+        "https://ai-automation-agent.onrender.com/docs/automate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message,
+            state: "start"
+          })
+        }
+      )
+  
+      if (!res.ok) {
+        throw new Error("API request failed")
+      }
+  
+      const data = await res.json()
+  
+      setResponse(data.message || "No response received.")
+      setActions(data.actions || [])
+  
+    } catch (error) {
+  
+      console.error(error)
+  
+      setResponse(
+        "The AI agent is waking up. Please try again in a moment."
+      )
+  
+    } finally {
+  
+      setLoading(false)
+  
       setTimeout(() => {
-        responseRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-
-    }, 700);
+        responseRef.current?.scrollIntoView({ behavior: "smooth" })
+      }, 100)
+  
+    }
   }
 
   return (
