@@ -12,17 +12,6 @@ AI-powered automation agent that interacts with recruiters by answering question
 
 ---
 
-## Tech Stack
-
-- Python
-- FastAPI
-- LangGraph
-- OpenAI API
-- Next.js
-- TypeScript
-- AI Agents
-- Automation Workflows
-
 ## Overview
 
 The AI Career Agent acts as a conversational interface for recruiters.
@@ -38,7 +27,44 @@ The system demonstrates practical AI agent design using LangGraph and LLM routin
 
 ---
 
+## Tech Stack
+
+- Python
+- FastAPI
+- LangGraph
+- OpenAI API
+- Next.js
+- TypeScript
+- AI Agents
+- Automation Workflows
+
+  
 ## System Architecture
+
+The AI Career Automation Agent is composed of three main components.
+
+```text
+Recruiter
+   │
+   ▼
+Next.js UI (AI Career Agent Interface)
+   │
+   ▼
+FastAPI Backend
+   │
+   ▼
+LangGraph Agent Workflow
+   │
+   ├─ Knowledge Node → Explains AI systems
+   ├─ Portfolio Node → Shares portfolio
+   ├─ CV Node → Sends CV
+   └─ Schedule Node → Links to Calendly
+   │
+   ▼
+OpenAI GPT Model
+```
+
+In summary:
 
 Frontend  
 Next.js conversational UI
