@@ -19,7 +19,7 @@ export default function Home() {
       setActions([])
   
       const res = await fetch(
-        "https://ai-automation-agent.onrender.com/docs/automate",
+        "https://ai-automation-agent.onrender.com/automate",
         {
           method: "POST",
           headers: {
@@ -27,7 +27,6 @@ export default function Home() {
           },
           body: JSON.stringify({
             message,
-            state: "start"
           })
         }
       )
