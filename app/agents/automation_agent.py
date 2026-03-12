@@ -48,6 +48,7 @@ Return ONLY the intent word.
     )
 
     content = response.choices[0].message.content or ""
+
     return content.strip().lower()
 
 
@@ -121,12 +122,14 @@ Infrastructure
         }
 
     # -----------------------------
-    # project / systems queries
+    # GitHub project questions
     # -----------------------------
+
     if (
-        "projects" in message_lower
-        or "systems" in message_lower
+        "project" in message_lower
+        or "projects" in message_lower
         or "github" in message_lower
+        or "systems" in message_lower
         or "repositories" in message_lower
     ):
         explanation = explain_projects()
@@ -141,7 +144,7 @@ Infrastructure
         }
 
     # -----------------------------
-    # dynamic GitHub project detection
+    # dynamic repo detection
     # -----------------------------
 
     repo_names = get_repo_names()
@@ -165,7 +168,7 @@ Infrastructure
             }
 
     # -----------------------------
-    # AI classifier fallback
+    # classifier fallback
     # -----------------------------
 
     intent = classify_intent(message)

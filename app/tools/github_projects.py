@@ -1,6 +1,9 @@
 import os
 import requests
 from openai import OpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -8,6 +11,7 @@ GITHUB_USERNAME = "Hillariaa"
 
 
 def fetch_projects():
+
     url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
     try:
@@ -32,11 +36,14 @@ def fetch_projects():
 
 
 def get_repo_names():
+
     projects = fetch_projects()
+
     return [p["name"] for p in projects]
 
 
 def fetch_readme(repo_name):
+
     url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{repo_name}/main/README.md"
 
     try:
@@ -52,6 +59,7 @@ def fetch_readme(repo_name):
 
 
 def explain_project_architecture(repo_name):
+
     readme = fetch_readme(repo_name)
 
     if not readme:
@@ -68,15 +76,15 @@ README:
 
 Explain this AI system clearly for a recruiter.
 
-Your explanation should include:
+Include:
 
-• What problem the system solves  
-• The architecture of the system  
-• Key technologies used  
-• How the AI works in the system  
+• what problem the system solves  
+• the architecture of the system  
+• key technologies used  
+• how the AI works  
 
 Keep the explanation clear, concise, and professional.
-Focus on the engineering and AI components.
+Focus on engineering and AI aspects.
 """
 
     response = client.chat.completions.create(
@@ -99,7 +107,10 @@ def explain_projects():
     project_text = ""
 
     for p in projects:
-        project_text += f"{p['name']}: {p['description']}\n"
+        name = p["name"]
+        description = p["description"] or "AI engineering project"
+
+        project_text += f"{name}: {description}\n"
 
     prompt = f"""
 Hilary is an Applied AI Engineer.
@@ -108,8 +119,16 @@ These are her GitHub repositories:
 
 {project_text}
 
-Explain the most important AI systems she built in a clear way for recruiters.
-Focus on the AI systems and engineering work.
+Explain the most important AI systems she built.
+
+Focus on:
+
+• what each system does
+• the AI techniques used
+• the engineering architecture
+• the technologies used
+
+Keep the explanation clear for recruiters.
 """
 
     response = client.chat.completions.create(
