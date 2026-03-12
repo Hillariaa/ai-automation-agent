@@ -121,6 +121,26 @@ Infrastructure
         }
 
     # -----------------------------
+    # project / systems queries
+    # -----------------------------
+    if (
+        "projects" in message_lower
+        or "systems" in message_lower
+        or "github" in message_lower
+        or "repositories" in message_lower
+    ):
+        explanation = explain_projects()
+
+        return {
+            "message": explanation,
+            "actions": [
+                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
+                {"label": "Download CV", "url": CV_LINK},
+                {"label": "Schedule Call", "url": CALENDLY_LINK},
+            ],
+        }
+
+    # -----------------------------
     # dynamic GitHub project detection
     # -----------------------------
 
