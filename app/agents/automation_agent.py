@@ -101,7 +101,9 @@ def automation_agent(message: str):
 
     message_lower = message.lower().strip()
 
+    # -----------------------------
     # AUDIO
+    # -----------------------------
 
     if "audio" in message_lower or "hear" in message_lower:
         return {
@@ -111,7 +113,9 @@ def automation_agent(message: str):
             ],
         }
 
+    # -----------------------------
     # PORTFOLIO
+    # -----------------------------
 
     if "portfolio" in message_lower:
         return {
@@ -119,7 +123,9 @@ def automation_agent(message: str):
             "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
         }
 
+    # -----------------------------
     # CV
+    # -----------------------------
 
     if "cv" in message_lower or "resume" in message_lower:
         return {
@@ -127,7 +133,9 @@ def automation_agent(message: str):
             "actions": [{"label": "Download CV", "url": CV_LINK}],
         }
 
+    # -----------------------------
     # SCHEDULE
+    # -----------------------------
 
     if "schedule" in message_lower or "meeting" in message_lower:
         return {
@@ -135,7 +143,9 @@ def automation_agent(message: str):
             "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
         }
 
+    # -----------------------------
     # TECH STACK
+    # -----------------------------
 
     if (
         "stack" in message_lower
@@ -172,20 +182,9 @@ Render
             ],
         }
 
-    # SPECIFIC PROJECT QUESTIONS
-
-    project_explanation = explain_specific_project(message_lower)
-
-    if project_explanation:
-        return {
-            "message": project_explanation.strip(),
-            "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-            ],
-        }
-
+    # -----------------------------
     # GENERAL PROJECT QUESTIONS
+    # -----------------------------
 
     if (
         "projects" in message_lower
@@ -203,6 +202,23 @@ Render
             ],
         }
 
+    # -----------------------------
+    # SPECIFIC PROJECT QUESTIONS
+    # -----------------------------
+
+    project_explanation = explain_specific_project(message_lower)
+
+    if project_explanation:
+        return {
+            "message": project_explanation.strip(),
+            "actions": [
+                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
+                {"label": "Download CV", "url": CV_LINK},
+            ],
+        }
+
+    # -----------------------------
     # DEFAULT
+    # -----------------------------
 
     return hilary_intro()
