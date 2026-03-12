@@ -66,7 +66,8 @@ def automation_agent(message: str):
     message_lower = message.lower().strip()
 
     # deterministic routing first
-    if message_lower == "audio":
+
+    if "audio" in message_lower or "hear" in message_lower or "voice" in message_lower:
         return {
             "message": "You can hear Hilary briefly introduce herself:",
             "actions": [
@@ -74,34 +75,29 @@ def automation_agent(message: str):
             ],
         }
 
-    if message_lower == "portfolio":
+    if "portfolio" in message_lower:
         return {
             "message": "You can explore Hilary's AI portfolio here:",
             "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
         }
 
-    if message_lower == "cv":
+    if "cv" in message_lower or "resume" in message_lower:
         return {
             "message": "You can download Hilary's CV here:",
             "actions": [{"label": "Download CV", "url": CV_LINK}],
         }
 
-    if message_lower == "schedule":
+    if "schedule" in message_lower or "meeting" in message_lower:
         return {
             "message": "You can schedule a call with Hilary here:",
             "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
         }
 
-    # use AI classifier for natural language
-    intent = classify_intent(message)
-
-    if intent == "intro":
-        return hilary_intro()
-
-    if intent == "systems":
-        return hilary_systems()
-
-    if intent == "tech":
+    if (
+        "stack" in message_lower
+        or "tech" in message_lower
+        or "technology" in message_lower
+    ):
         return {
             "message": """
 Hilary's AI engineering stack includes:
@@ -131,5 +127,14 @@ Infrastructure
                 {"label": "Schedule Call", "url": CALENDLY_LINK},
             ],
         }
+
+    # fallback to AI classifier
+    intent = classify_intent(message)
+
+    if intent == "intro":
+        return hilary_intro()
+
+    if intent == "systems":
+        return hilary_systems()
 
     return hilary_intro()
