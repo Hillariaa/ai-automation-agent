@@ -1,46 +1,13 @@
+import os
 import requests
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 GITHUB_USERNAME = "Hillariaa"
 
 
-def explain_project_architecture(repo_name):
-
-    readme = fetch_readme(repo_name)
-
-    if not readme:
-        return "Sorry, I couldn't retrieve the project documentation."
-
-    prompt = f"""
-Hilary built this AI system.
-
-Project README:
-
-{readme}
-
-Explain the architecture of this project clearly for a recruiter.
-Focus on:
-- the AI system
-- the tools used
-- the architecture
-- what problem it solves
-"""
-
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    return response.choices[0].message.content
-
-
 def fetch_projects():
-
     url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
     try:
@@ -48,9 +15,6 @@ def fetch_projects():
         response.raise_for_status()
         repos = response.json()
     except Exception:
-        return []
-
-    if not repos:
         return []
 
     projects = []
@@ -67,23 +31,62 @@ def fetch_projects():
     return projects
 
 
+def get_repo_names():
+    projects = fetch_projects()
+    return [p["name"] for p in projects]
+
+
 def fetch_readme(repo_name):
+    url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{repo_name}/main/README.md"
 
-    url = f"https://raw.githubusercontent.com/Hillariaa/{repo_name}/main/README.md"
+    try:
+        response = requests.get(url)
 
-    response = requests.get(url)
+        if response.status_code != 200:
+            return None
 
-    if response.status_code != 200:
+        return response.text
+
+    except Exception:
         return None
 
-    return response.text
 
+def explain_project_architecture(repo_name):
+    readme = fetch_readme(repo_name)
 
-def get_repo_names():
+    if not readme:
+        return "Sorry, I couldn't retrieve the project documentation."
 
-    projects = fetch_projects()
+    prompt = f"""
+Hilary is an Applied AI Engineer.
 
-    return [p["name"] for p in projects]
+Below is the README of one of her GitHub projects.
+
+README:
+
+{readme}
+
+Explain this AI system clearly for a recruiter.
+
+Your explanation should include:
+
+• What problem the system solves  
+• The architecture of the system  
+• Key technologies used  
+• How the AI works in the system  
+
+Keep the explanation clear, concise, and professional.
+Focus on the engineering and AI components.
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    content = response.choices[0].message.content or ""
+
+    return content.strip()
 
 
 def explain_projects():
@@ -91,7 +94,7 @@ def explain_projects():
     projects = fetch_projects()
 
     if not projects:
-        return "Hilary has built several AI systems available on her GitHub."
+        return "Hilary has built several applied AI systems available on her GitHub."
 
     project_text = ""
 
@@ -99,14 +102,14 @@ def explain_projects():
         project_text += f"{p['name']}: {p['description']}\n"
 
     prompt = f"""
-Hilary is an applied AI engineer.
+Hilary is an Applied AI Engineer.
 
-These are her GitHub projects:
+These are her GitHub repositories:
 
 {project_text}
 
 Explain the most important AI systems she built in a clear way for recruiters.
-Focus on AI systems and automation tools.
+Focus on the AI systems and engineering work.
 """
 
     response = client.chat.completions.create(

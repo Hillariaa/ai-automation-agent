@@ -59,7 +59,7 @@ def automation_agent(message: str):
     # deterministic routing
     # -----------------------------
 
-    if "audio" in message_lower or "hear" in message_lower or "voice" in message_lower:
+    if "audio" in message_lower or "hear" in message_lower:
         return {
             "message": "You can hear Hilary briefly introduce herself:",
             "actions": [
@@ -84,10 +84,6 @@ def automation_agent(message: str):
             "message": "You can schedule a call with Hilary here:",
             "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
         }
-
-    # -----------------------------
-    # tech stack routing
-    # -----------------------------
 
     if (
         "stack" in message_lower
@@ -132,8 +128,9 @@ Infrastructure
 
     for repo in repo_names:
         repo_words = repo.replace("-", " ")
+        keywords = repo_words.split()
 
-        if repo_words in message_lower:
+        if any(word in message_lower for word in keywords):
             explanation = explain_project_architecture(repo)
 
             return {
@@ -161,29 +158,6 @@ Infrastructure
 
         return {
             "message": explanation,
-            "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-                {"label": "Schedule Call", "url": CALENDLY_LINK},
-            ],
-        }
-
-    if intent == "tech":
-        return {
-            "message": """
-Hilary builds applied AI systems using:
-
-• Python
-• FastAPI
-• OpenAI APIs
-• LangGraph
-• Retrieval-Augmented Generation (RAG)
-• Next.js
-• TailwindCSS
-
-Her work focuses on AI agents, automation systems,
-and intelligent developer tools.
-""",
             "actions": [
                 {"label": "View Portfolio", "url": PORTFOLIO_LINK},
                 {"label": "Download CV", "url": CV_LINK},
