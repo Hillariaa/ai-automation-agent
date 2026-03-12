@@ -3,32 +3,34 @@ import requests
 from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables
 load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 GITHUB_USERNAME = "Hillariaa"
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def fetch_projects():
 
     url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "ai-career-agent",
-    }
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "ai-career-agent"}
+
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
     try:
         response = requests.get(url, headers=headers)
 
         if response.status_code != 200:
+            print("GitHub API error:", response.status_code, response.text)
             return []
 
         repos = response.json()
 
-    except Exception:
+    except Exception as e:
+        print("GitHub request failed:", e)
         return []
 
     projects = []
@@ -93,8 +95,7 @@ Include:
 • key technologies used
 • how the AI works
 
-Keep the explanation clear, concise, and professional.
-Focus on engineering and AI aspects.
+Keep the explanation concise and professional.
 """
 
     response = client.chat.completions.create(
@@ -102,9 +103,7 @@ Focus on engineering and AI aspects.
         messages=[{"role": "user", "content": prompt}],
     )
 
-    content = response.choices[0].message.content or ""
-
-    return content.strip()
+    return (response.choices[0].message.content or "").strip()
 
 
 def explain_projects():
@@ -119,7 +118,6 @@ def explain_projects():
     for p in projects:
         name = p["name"]
         description = p["description"] or "AI engineering project"
-
         project_text += f"{name}: {description}\n"
 
     prompt = f"""
@@ -134,11 +132,11 @@ Explain the most important AI systems she built.
 Focus on:
 
 • what each system does
-• the AI techniques used
-• the engineering architecture
-• the technologies used
+• AI techniques used
+• system architecture
+• technologies used
 
-Keep the explanation clear for recruiters.
+Write the explanation for a recruiter reviewing her work.
 """
 
     response = client.chat.completions.create(
@@ -146,6 +144,4 @@ Keep the explanation clear for recruiters.
         messages=[{"role": "user", "content": prompt}],
     )
 
-    content = response.choices[0].message.content or ""
-
-    return content.strip()
+    return (response.choices[0].message.content or "").strip()
