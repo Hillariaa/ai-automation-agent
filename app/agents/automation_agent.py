@@ -63,13 +63,37 @@ Return ONLY the intent name.
 
 def automation_agent(message: str):
 
-    message_lower = message.lower()
+    message_lower = message.lower().strip()
 
     # deterministic routing first
-    if "audio" in message_lower or "voice" in message_lower or "hear" in message_lower:
-        intent = "audio"
-    else:
-        intent = classify_intent(message)
+    if message_lower == "audio":
+        return {
+            "message": "You can hear Hilary briefly introduce herself:",
+            "actions": [
+                {"label": "▶ Play Introduction", "url": "/audio/hilary_intro.mp3"}
+            ],
+        }
+
+    if message_lower == "portfolio":
+        return {
+            "message": "You can explore Hilary's AI portfolio here:",
+            "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
+        }
+
+    if message_lower == "cv":
+        return {
+            "message": "You can download Hilary's CV here:",
+            "actions": [{"label": "Download CV", "url": CV_LINK}],
+        }
+
+    if message_lower == "schedule":
+        return {
+            "message": "You can schedule a call with Hilary here:",
+            "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
+        }
+
+    # use AI classifier for natural language
+    intent = classify_intent(message)
 
     if intent == "intro":
         return hilary_intro()
@@ -77,48 +101,20 @@ def automation_agent(message: str):
     if intent == "systems":
         return hilary_systems()
 
-    if intent == "portfolio":
-        return {
-            "message": "You can explore Hilary's AI portfolio here:",
-            "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
-        }
-
-    if intent == "cv":
-        return {
-            "message": "You can download Hilary's CV here:",
-            "actions": [{"label": "Download CV", "url": CV_LINK}],
-        }
-
-    if intent == "schedule":
-        return {
-            "message": "You can schedule a call with Hilary here:",
-            "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
-        }
-
-    if intent == "audio":
-        return {
-            "message": "You can hear Hilary briefly introduce herself and explain the AI systems she builds:",
-            "actions": [
-                {"label": "▶ Play Introduction", "url": "/audio/hilary_intro.mp3"}
-            ],
-        }
-
     if intent == "tech":
         return {
             "message": """
 Hilary's AI engineering stack includes:
 
-AI & LLM Systems
+AI Systems
 • OpenAI APIs
 • LangGraph
 • Retrieval-Augmented Generation (RAG)
-• AI agent architectures
-• Whisper speech processing
+• AI agents
 
 Backend
 • Python
 • FastAPI
-• API-based AI services
 
 Frontend
 • Next.js
@@ -126,12 +122,8 @@ Frontend
 • TailwindCSS
 
 Infrastructure
-• Vercel deployment
-• Render backend services
-
-These technologies power systems like her Research Agent,
-Interview Intelligence system, Knowledge Copilot, and
-AI Career Assistant.
+• Vercel
+• Render
 """,
             "actions": [
                 {"label": "View Portfolio", "url": PORTFOLIO_LINK},
