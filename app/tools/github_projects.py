@@ -8,39 +8,36 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 GITHUB_USERNAME = "Hillariaa"
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 
 def fetch_projects():
 
-    url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
-
-    headers = {"Accept": "application/vnd.github+json", "User-Agent": "ai-career-agent"}
-
-    if GITHUB_TOKEN:
-        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    url = f"https://github.com/{GITHUB_USERNAME}?tab=repositories"
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url)
 
         if response.status_code != 200:
-            print("GitHub API error:", response.status_code, response.text)
             return []
 
-        repos = response.json()
+        html = response.text
 
-    except Exception as e:
-        print("GitHub request failed:", e)
+    except Exception:
         return []
 
     projects = []
 
-    for repo in repos:
+    # simple repo name extraction
+    parts = html.split('itemprop="name codeRepository"')
+
+    for part in parts[1:]:
+        repo = part.split(">")[1].split("<")[0].strip()
+
         projects.append(
             {
-                "name": repo.get("name"),
-                "description": repo.get("description"),
-                "url": repo.get("html_url"),
+                "name": repo,
+                "description": "AI engineering project",
+                "url": f"https://github.com/{GITHUB_USERNAME}/{repo}",
             }
         )
 
@@ -75,7 +72,7 @@ def explain_project_architecture(repo_name):
     readme = fetch_readme(repo_name)
 
     if not readme:
-        return "Sorry, I couldn't retrieve the project documentation."
+        return f"{repo_name} is one of Hilary's AI engineering projects."
 
     prompt = f"""
 Hilary is an Applied AI Engineer.
@@ -111,21 +108,19 @@ def explain_projects():
     projects = fetch_projects()
 
     if not projects:
-        return "Hilary has built several applied AI systems available on her GitHub."
+        return "Hilary has built several applied AI systems across multiple GitHub repositories."
 
-    project_text = ""
+    project_list = ""
 
     for p in projects:
-        name = p["name"]
-        description = p["description"] or "AI engineering project"
-        project_text += f"{name}: {description}\n"
+        project_list += f"{p['name']}\n"
 
     prompt = f"""
 Hilary is an Applied AI Engineer.
 
 These are her GitHub repositories:
 
-{project_text}
+{project_list}
 
 Explain the most important AI systems she built.
 
