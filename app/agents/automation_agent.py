@@ -3,7 +3,12 @@ import os
 from dotenv import load_dotenv
 
 from app.tools.outreach_tools import PORTFOLIO_LINK, CV_LINK, CALENDLY_LINK
-from app.tools.hilary_knowledge import hilary_intro, hilary_systems
+from app.tools.hilary_knowledge import hilary_intro
+from app.tools.github_projects import (
+    explain_projects,
+    explain_project_architecture,
+    get_repo_names,
+)
 
 load_dotenv()
 
@@ -50,9 +55,11 @@ def automation_agent(message: str):
 
     message_lower = message.lower().strip()
 
-    # deterministic routing (fast + reliable)
+    # -----------------------------
+    # deterministic routing
+    # -----------------------------
 
-    if "audio" in message_lower or "hear" in message_lower:
+    if "audio" in message_lower or "hear" in message_lower or "voice" in message_lower:
         return {
             "message": "You can hear Hilary briefly introduce herself:",
             "actions": [
@@ -77,6 +84,10 @@ def automation_agent(message: str):
             "message": "You can schedule a call with Hilary here:",
             "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
         }
+
+    # -----------------------------
+    # tech stack routing
+    # -----------------------------
 
     if (
         "stack" in message_lower
@@ -113,7 +124,32 @@ Infrastructure
             ],
         }
 
-    # LLM classifier fallback
+    # -----------------------------
+    # dynamic GitHub project detection
+    # -----------------------------
+
+    repo_names = get_repo_names()
+
+    for repo in repo_names:
+        repo_words = repo.replace("-", " ")
+
+        if repo_words in message_lower:
+            explanation = explain_project_architecture(repo)
+
+            return {
+                "message": explanation,
+                "actions": [
+                    {
+                        "label": "View Project",
+                        "url": f"https://github.com/Hillariaa/{repo}",
+                    },
+                    {"label": "View Portfolio", "url": PORTFOLIO_LINK},
+                ],
+            }
+
+    # -----------------------------
+    # AI classifier fallback
+    # -----------------------------
 
     intent = classify_intent(message)
 
@@ -121,7 +157,16 @@ Infrastructure
         return hilary_intro()
 
     if intent == "systems":
-        return hilary_systems()
+        explanation = explain_projects()
+
+        return {
+            "message": explanation,
+            "actions": [
+                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
+                {"label": "Download CV", "url": CV_LINK},
+                {"label": "Schedule Call", "url": CALENDLY_LINK},
+            ],
+        }
 
     if intent == "tech":
         return {
