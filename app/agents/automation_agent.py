@@ -4,58 +4,77 @@ from dotenv import load_dotenv
 
 from app.tools.outreach_tools import PORTFOLIO_LINK, CV_LINK, CALENDLY_LINK
 from app.tools.hilary_knowledge import hilary_intro
-from app.tools.github_projects import (
-    explain_projects,
-    explain_project_architecture,
-    get_repo_names,
-)
+from app.tools.github_projects import explain_projects
 
 load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def classify_intent(message: str) -> str:
+def explain_specific_project(project: str):
 
-    prompt = f"""
-You are the intent router for Hilary's AI Career Assistant.
+    explanations = {
+        "research": """
+AI Research Agent
 
-Classify the user's message into ONE of the following intents.
+An autonomous research system built using LangGraph and OpenAI APIs.
+The agent performs multi-step reasoning, retrieves information from external
+sources, and generates structured research outputs automatically.
 
-Message:
-{message}
+Technologies: Python, LangGraph, OpenAI APIs, Retrieval systems.
+""",
+        "interview": """
+AI Interview Intelligence
 
-Valid intents:
+A multimodal AI system that analyzes interview recordings using speech-to-text
+and large language models. It generates structured insights about candidate
+responses, communication clarity, and key themes discussed in interviews.
 
-intro
-systems
-portfolio
-cv
-schedule
-audio
-tech
-projects
-unknown
+Technologies: Python, OpenAI APIs, speech-to-text models, NLP analysis.
+""",
+        "knowledge": """
+AI Knowledge Copilot
 
-Return ONLY the intent word.
-"""
+A retrieval-augmented generation assistant that allows users to query
+knowledge bases and receive grounded answers. It combines vector search
+with large language models to synthesize accurate responses.
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You classify user intent."},
-            {"role": "user", "content": prompt},
-        ],
-    )
+Technologies: Python, vector databases, OpenAI APIs, RAG architecture.
+""",
+        "automation": """
+AI Automation Agent
 
-    return (response.choices[0].message.content or "").strip().lower()
+An AI assistant designed to automate recruiter interactions.
+It explains Hilary’s AI systems, shares her portfolio, provides her CV,
+and allows recruiters to schedule calls through an intelligent interface.
+
+Technologies: FastAPI, Next.js, OpenAI APIs, automation workflows.
+""",
+        "career": """
+AI Career Agent UI
+
+A modern conversational interface built with Next.js that allows recruiters
+to interact with Hilary’s AI assistant. The UI connects to a FastAPI backend
+that powers the AI reasoning and automation logic.
+
+Technologies: Next.js, React, TailwindCSS, FastAPI.
+""",
+    }
+
+    for key in explanations:
+        if key in project:
+            return explanations[key]
+
+    return None
 
 
 def automation_agent(message: str):
 
     message_lower = message.lower().strip()
 
+    # -----------------------------
     # AUDIO
+    # -----------------------------
     if "audio" in message_lower or "hear" in message_lower:
         return {
             "message": "You can hear Hilary briefly introduce herself:",
@@ -64,70 +83,54 @@ def automation_agent(message: str):
             ],
         }
 
+    # -----------------------------
     # PORTFOLIO
+    # -----------------------------
     if "portfolio" in message_lower:
         return {
             "message": "You can explore Hilary's AI portfolio here:",
             "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
         }
 
+    # -----------------------------
     # CV
+    # -----------------------------
     if "cv" in message_lower or "resume" in message_lower:
         return {
             "message": "You can download Hilary's CV here:",
             "actions": [{"label": "Download CV", "url": CV_LINK}],
         }
 
-    # SCHEDULING
+    # -----------------------------
+    # SCHEDULE
+    # -----------------------------
     if "schedule" in message_lower or "meeting" in message_lower:
         return {
             "message": "You can schedule a call with Hilary here:",
             "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
         }
 
-    # TECH STACK
-    if (
-        "stack" in message_lower
-        or "tech" in message_lower
-        or "technology" in message_lower
-    ):
+    # -----------------------------
+    # SPECIFIC PROJECT EXPLANATION
+    # -----------------------------
+    project_explanation = explain_specific_project(message_lower)
+
+    if project_explanation:
         return {
-            "message": """
-Hilary's AI engineering stack includes:
-
-AI Systems
-• OpenAI APIs
-• LangGraph
-• Retrieval-Augmented Generation (RAG)
-• AI agents
-
-Backend
-• Python
-• FastAPI
-
-Frontend
-• Next.js
-• React
-• TailwindCSS
-
-Infrastructure
-• Vercel
-• Render
-""",
+            "message": project_explanation.strip(),
             "actions": [
                 {"label": "View Portfolio", "url": PORTFOLIO_LINK},
                 {"label": "Download CV", "url": CV_LINK},
-                {"label": "Schedule Call", "url": CALENDLY_LINK},
             ],
         }
 
-    # PROJECT QUESTIONS (KEY FIX)
+    # -----------------------------
+    # PROJECT OVERVIEW
+    # -----------------------------
     if (
-        "project" in message_lower
-        or "projects" in message_lower
-        or "github" in message_lower
+        "projects" in message_lower
         or "systems" in message_lower
-        or "repositories" in message_lower
+        or "github" in message_lower
     ):
         explanation = explain_projects()
 
@@ -140,43 +143,7 @@ Infrastructure
             ],
         }
 
-    # DYNAMIC PROJECT DETECTION
-    repo_names = get_repo_names()
-
-    for repo in repo_names:
-        repo_words = repo.replace("-", " ")
-        keywords = repo_words.split()
-
-        if any(word in message_lower for word in keywords):
-            explanation = explain_project_architecture(repo)
-
-            return {
-                "message": explanation,
-                "actions": [
-                    {
-                        "label": "View Project",
-                        "url": f"https://github.com/Hillariaa/{repo}",
-                    },
-                    {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                ],
-            }
-
-    # FALLBACK CLASSIFIER
-    intent = classify_intent(message)
-
-    if intent == "intro":
-        return hilary_intro()
-
-    if intent == "projects" or intent == "systems":
-        explanation = explain_projects()
-
-        return {
-            "message": explanation,
-            "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-                {"label": "Schedule Call", "url": CALENDLY_LINK},
-            ],
-        }
-
+    # -----------------------------
+    # DEFAULT
+    # -----------------------------
     return hilary_intro()

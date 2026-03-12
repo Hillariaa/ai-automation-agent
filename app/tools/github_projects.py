@@ -105,7 +105,6 @@ Keep the explanation concise and professional.
 
 def explain_projects():
 
-    # Only include Hilary's AI systems
     ai_projects = [
         "ai-research-agent",
         "ai-interview-intelligence",
@@ -114,46 +113,50 @@ def explain_projects():
         "ai-career-agent-ui",
     ]
 
-    repo_list = "\n".join(ai_projects)
+    explanations = []
 
-    prompt = f"""
+    for repo in ai_projects:
+        readme = fetch_readme(repo)
+
+        if not readme:
+            continue
+
+        prompt = f"""
 Hilary is an Applied AI Engineer.
 
-These are the main AI systems she has built:
+Below is the README of one of her AI systems.
 
-{repo_list}
+Repository: {repo}
 
-Explain each system clearly for a recruiter reviewing her work.
+README:
+
+{readme}
+
+Explain the system clearly for a recruiter.
 
 Rules:
-- Use clean plain text
-- Do NOT use markdown
-- Do NOT use ### headings
-- Do NOT use **bold**
-- Keep explanations short and professional
-- Focus on what the system does and the technologies used
+- clean plain text
+- no markdown
+- no asterisks
+- short paragraphs
 
-Format:
-
-AI Research Agent
-Short explanation.
-
-AI Interview Intelligence
-Short explanation.
-
-AI Knowledge Copilot
-Short explanation.
-
-AI Automation Agent
-Short explanation.
-
-AI Career Agent UI
-Short explanation.
+Include:
+• what the system does
+• the architecture
+• key technologies used
+• how the AI works
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-    )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+        )
 
-    return (response.choices[0].message.content or "").strip()
+        text = (response.choices[0].message.content or "").strip()
+
+        explanations.append(text)
+
+    if not explanations:
+        return "Hilary has built several applied AI systems across her GitHub repositories."
+
+    return "\n\n".join(explanations)
