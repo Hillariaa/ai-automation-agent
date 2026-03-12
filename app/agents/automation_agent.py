@@ -63,7 +63,13 @@ Return ONLY the intent name.
 
 def automation_agent(message: str):
 
-    intent = classify_intent(message)
+    message_lower = message.lower()
+
+    # deterministic routing first
+    if "audio" in message_lower or "voice" in message_lower or "hear" in message_lower:
+        intent = "audio"
+    else:
+        intent = classify_intent(message)
 
     if intent == "intro":
         return hilary_intro()
