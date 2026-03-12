@@ -105,33 +105,50 @@ Keep the explanation concise and professional.
 
 def explain_projects():
 
-    projects = fetch_projects()
+    # Only include Hilary's AI systems
+    ai_projects = [
+        "ai-research-agent",
+        "ai-interview-intelligence",
+        "ai-knowledge-copilot",
+        "ai-automation-agent",
+        "ai-career-agent-ui",
+    ]
 
-    if not projects:
-        return "Hilary has built several applied AI systems across multiple GitHub repositories."
-
-    project_list = ""
-
-    for p in projects:
-        project_list += f"{p['name']}\n"
+    repo_list = "\n".join(ai_projects)
 
     prompt = f"""
 Hilary is an Applied AI Engineer.
 
-These are her GitHub repositories:
+These are the main AI systems she has built:
 
-{project_list}
+{repo_list}
 
-Explain the most important AI systems she built.
+Explain each system clearly for a recruiter reviewing her work.
 
-Focus on:
+Rules:
+- Use clean plain text
+- Do NOT use markdown
+- Do NOT use ### headings
+- Do NOT use **bold**
+- Keep explanations short and professional
+- Focus on what the system does and the technologies used
 
-• what each system does
-• AI techniques used
-• system architecture
-• technologies used
+Format:
 
-Write the explanation for a recruiter reviewing her work.
+AI Research Agent
+Short explanation.
+
+AI Interview Intelligence
+Short explanation.
+
+AI Knowledge Copilot
+Short explanation.
+
+AI Automation Agent
+Short explanation.
+
+AI Career Agent UI
+Short explanation.
 """
 
     response = client.chat.completions.create(
