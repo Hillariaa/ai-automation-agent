@@ -1,8 +1,9 @@
 import os
 import requests
-from openai import OpenAI
 from dotenv import load_dotenv
+from openai import OpenAI
 
+# Load environment variables
 load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -14,10 +15,19 @@ def fetch_projects():
 
     url = f"https://api.github.com/users/{GITHUB_USERNAME}/repos"
 
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "ai-career-agent",
+    }
+
     try:
-        response = requests.get(url)
-        response.raise_for_status()
+        response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            return []
+
         repos = response.json()
+
     except Exception:
         return []
 
@@ -78,10 +88,10 @@ Explain this AI system clearly for a recruiter.
 
 Include:
 
-• what problem the system solves  
-• the architecture of the system  
-• key technologies used  
-• how the AI works  
+• what problem the system solves
+• the architecture of the system
+• key technologies used
+• how the AI works
 
 Keep the explanation clear, concise, and professional.
 Focus on engineering and AI aspects.
