@@ -20,33 +20,18 @@ Classify the user's message into ONE of the following intents.
 Message:
 {message}
 
-Intents:
+Valid intents:
 
 intro
-User wants to know who Hilary is.
-
 systems
-User asks about AI systems, projects, or what she has built.
-
 portfolio
-User wants to view Hilary's portfolio or see her work.
-
 cv
-User asks for Hilary's CV or resume.
-
 schedule
-User wants to schedule a meeting or call.
-
 audio
-User wants to hear Hilary introduce herself or mentions audio.
-
 tech
-User asks about Hilary's tech stack, tools, or technologies she uses.
-
 unknown
-Anything else.
 
-Return ONLY the intent name.
+Return ONLY the intent word.
 """
 
     response = client.chat.completions.create(
@@ -65,9 +50,9 @@ def automation_agent(message: str):
 
     message_lower = message.lower().strip()
 
-    # deterministic routing first
+    # deterministic routing (fast + reliable)
 
-    if "audio" in message_lower or "hear" in message_lower or "voice" in message_lower:
+    if "audio" in message_lower or "hear" in message_lower:
         return {
             "message": "You can hear Hilary briefly introduce herself:",
             "actions": [
@@ -128,7 +113,8 @@ Infrastructure
             ],
         }
 
-    # fallback to AI classifier
+    # LLM classifier fallback
+
     intent = classify_intent(message)
 
     if intent == "intro":
@@ -136,5 +122,28 @@ Infrastructure
 
     if intent == "systems":
         return hilary_systems()
+
+    if intent == "tech":
+        return {
+            "message": """
+Hilary builds applied AI systems using:
+
+• Python
+• FastAPI
+• OpenAI APIs
+• LangGraph
+• Retrieval-Augmented Generation (RAG)
+• Next.js
+• TailwindCSS
+
+Her work focuses on AI agents, automation systems,
+and intelligent developer tools.
+""",
+            "actions": [
+                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
+                {"label": "Download CV", "url": CV_LINK},
+                {"label": "Schedule Call", "url": CALENDLY_LINK},
+            ],
+        }
 
     return hilary_intro()
