@@ -1,32 +1,21 @@
 from app.tools.outreach_tools import PORTFOLIO_LINK, CV_LINK, CALENDLY_LINK
 
 
-def recruiter_intro():
+def hilary_intro():
+
     return {
         "message": """
-Hi — this assistant helps you evaluate Hilary's AI systems and engineering work.
+Hi — explore Hilary’s AI work and projects.
 
-Start here:
+This assistant lets you understand how she designs and builds real AI systems.
+
+Ask anything or start below:
 """,
         "actions": [
-            {"label": "Why hire Hilary", "message": "why hire hilary"},
-            {"label": "Key projects", "message": "projects"},
-            {"label": "Download CV", "url": CV_LINK},
-            {"label": "Schedule Call", "url": CALENDLY_LINK},
-        ],
-    }
-
-
-def normal_intro():
-    return {
-        "message": """
-Hi — explore Hilary's AI work and projects.
-
-Ask anything or browse below.
-""",
-        "actions": [
+            {"label": "Key Projects", "message": "projects"},
+            {"label": "Why hire Hilary", "message": "why hire"},
             {"label": "View Portfolio", "url": PORTFOLIO_LINK},
             {"label": "Download CV", "url": CV_LINK},
-            {"label": "Schedule Call", "url": CALENDLY_LINK},
+            {"label": "Discuss role fit (15 min)", "url": CALENDLY_LINK},
         ],
     }
