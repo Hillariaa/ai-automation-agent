@@ -4,7 +4,6 @@ CALENDLY_LINK = "https://calendly.com/hilariezee/30min"
 
 
 def portfolio_response():
-
     return {
         "message": "You can explore Hilary's AI projects and systems here:",
         "actions": [
@@ -14,7 +13,6 @@ def portfolio_response():
 
 
 def cv_response():
-
     return {
         "message": "You can view Hilary's CV here:",
         "actions": [
@@ -24,7 +22,6 @@ def cv_response():
 
 
 def calendly_response():
-
     return {
         "message": "Great! You can schedule a call with Hilary here:",
         "actions": [

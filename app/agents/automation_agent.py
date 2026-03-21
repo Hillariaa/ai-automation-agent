@@ -1,224 +1,77 @@
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
+from datetime import datetime
 
-from app.tools.outreach_tools import PORTFOLIO_LINK, CV_LINK, CALENDLY_LINK
-from app.tools.hilary_knowledge import hilary_intro
-from app.tools.github_projects import explain_projects
-
-load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from app.db.memory import get_user, update_user, update_intent
+from app.tools.outreach_tools import (
+    portfolio_response,
+    cv_response,
+    calendly_response,
+)
+from app.tools.hilary_knowledge import recruiter_intro, normal_intro
 
 
-def explain_specific_project(message_lower: str):
+def automation_agent(user_id: str, message: str):
 
-    if "research" in message_lower:
-        return """
-AI Research Agent
+    user = get_user(user_id)
 
-An autonomous research system built using LangGraph and OpenAI APIs.
-It performs multi-step reasoning to gather information from sources,
-analyze documents, and generate structured research outputs.
+    if not user:
+        return {"message": "User not found.", "actions": []}
 
-Technologies
-Python
-LangGraph
-OpenAI APIs
-Retrieval pipelines
-"""
-
-    if "interview" in message_lower:
-        return """
-AI Interview Intelligence
-
-A multimodal AI system that analyzes interview recordings using
-speech-to-text models and large language models.
-
-The system extracts insights about candidate responses,
-communication clarity, and key interview themes.
-
-Technologies
-Python
-OpenAI APIs
-Speech-to-text models
-Natural language processing
-"""
-
-    if "knowledge" in message_lower:
-        return """
-AI Knowledge Copilot
-
-A retrieval-augmented generation assistant that allows users
-to query knowledge bases and receive grounded responses.
-
-The system combines vector search with large language models
-to synthesize accurate answers from documents.
-
-Technologies
-Python
-Vector databases
-OpenAI APIs
-RAG architecture
-"""
-
-    if "automation" in message_lower:
-        return """
-AI Automation Agent
-
-An AI assistant designed to automate recruiter interactions.
-It explains Hilary's AI systems, shares portfolio links,
-provides CV downloads, and allows scheduling meetings.
-
-Technologies
-FastAPI
-Next.js
-OpenAI APIs
-Automation workflows
-"""
-
-    if "career" in message_lower or "ui" in message_lower:
-        return """
-AI Career Agent UI
-
-A conversational interface that allows recruiters to interact
-with Hilary's AI assistant and explore her AI engineering work.
-
-The interface connects to a FastAPI backend that handles
-AI reasoning, automation, and GitHub project explanations.
-
-Technologies
-Next.js
-React
-TailwindCSS
-FastAPI
-"""
-
-    return None
-
-
-def automation_agent(message: str):
+    update_user(user_id, "last_active", datetime.utcnow())
 
     message_lower = message.lower().strip()
 
-    # -----------------------------
-    # AUDIO
-    # -----------------------------
+    # FIRST LOAD
+    if message_lower == "start":
+        return recruiter_intro() if user.get("source") == "outreach" else normal_intro()
 
-    if "audio" in message_lower or "hear" in message_lower:
-        return {
-            "message": "You can hear Hilary briefly introduce herself:",
-            "actions": [
-                {"label": "▶ Play Introduction", "url": "/audio/hilary_intro.mp3"}
-            ],
-        }
+    # track activity
+    user["progress"].append(message_lower)
+    update_intent(user_id)
 
-    # -----------------------------
-    # PORTFOLIO
-    # -----------------------------
-
-    if "portfolio" in message_lower:
-        return {
-            "message": "You can explore Hilary's AI portfolio here:",
-            "actions": [{"label": "Open Portfolio", "url": PORTFOLIO_LINK}],
-        }
-
-    # -----------------------------
-    # CV
-    # -----------------------------
-
-    if "cv" in message_lower or "resume" in message_lower:
-        return {
-            "message": "You can download Hilary's CV here:",
-            "actions": [{"label": "Download CV", "url": CV_LINK}],
-        }
-
-    # -----------------------------
-    # SCHEDULE
-    # -----------------------------
-
-    if "schedule" in message_lower or "meeting" in message_lower:
-        return {
-            "message": "You can schedule a call with Hilary here:",
-            "actions": [{"label": "Schedule Meeting", "url": CALENDLY_LINK}],
-        }
-
-    # -----------------------------
-    # TECH STACK
-    # -----------------------------
-
-    if (
-        "stack" in message_lower
-        or "tech" in message_lower
-        or "technology" in message_lower
-    ):
+    # recruiter actions
+    if "why hire" in message_lower:
         return {
             "message": """
-Hilary's AI engineering stack includes
+Hilary builds real-world AI systems, not just prototypes.
 
-AI Systems
-OpenAI APIs
-LangGraph
-Retrieval-Augmented Generation
-Autonomous AI agents
-
-Backend
-Python
-FastAPI
-
-Frontend
-Next.js
-React
-TailwindCSS
-
-Infrastructure
-Vercel
-Render
+• LLM systems, RAG, agents  
+• Production-focused engineering  
+• Full-stack AI products  
 """,
             "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-                {"label": "Schedule Call", "url": CALENDLY_LINK},
+                {"label": "Download CV", "url": cv_response()["actions"][0]["url"]},
+                {
+                    "label": "Schedule Call",
+                    "url": calendly_response()["actions"][0]["url"],
+                },
             ],
         }
 
-    # -----------------------------
-    # GENERAL PROJECT QUESTIONS
-    # -----------------------------
-
-    if (
-        "projects" in message_lower
-        or "systems" in message_lower
-        or "github" in message_lower
-    ):
-        explanation = explain_projects()
-
+    if "projects" in message_lower:
         return {
-            "message": explanation,
+            "message": """
+Key systems:
+
+• AI Research Agent  
+• AI Interview Intelligence  
+• Knowledge Copilot  
+• AI Automation Agent  
+""",
             "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-                {"label": "Schedule Call", "url": CALENDLY_LINK},
+                {
+                    "label": "View Portfolio",
+                    "url": portfolio_response()["actions"][0]["url"],
+                },
             ],
         }
 
-    # -----------------------------
-    # SPECIFIC PROJECT QUESTIONS
-    # -----------------------------
+    if "portfolio" in message_lower:
+        return portfolio_response()
 
-    project_explanation = explain_specific_project(message_lower)
+    if "cv" in message_lower:
+        return cv_response()
 
-    if project_explanation:
-        return {
-            "message": project_explanation.strip(),
-            "actions": [
-                {"label": "View Portfolio", "url": PORTFOLIO_LINK},
-                {"label": "Download CV", "url": CV_LINK},
-            ],
-        }
+    if "schedule" in message_lower:
+        return calendly_response()
 
-    # -----------------------------
-    # DEFAULT
-    # -----------------------------
-
-    return hilary_intro()
+    return normal_intro()
