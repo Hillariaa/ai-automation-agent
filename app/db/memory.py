@@ -19,6 +19,8 @@ def create_user(user_id: str, context: dict):
         "last_active": datetime.utcnow(),
         "created_at": datetime.utcnow(),
         "is_high_intent": False,
+        #  TEMP TEST EMAIL
+        "email": "your_email@example.com",
     }
     return USER_DB[user_id]
 

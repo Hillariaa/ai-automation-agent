@@ -1,16 +1,31 @@
-# app/outreach/sender.py
+import os
+import requests
+
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 
-def send_email(email: str, message: str):
-    """
-    Mock email sender (for now).
-    Later replace with:
-    - SendGrid
-    - Resend
-    - Gmail API
-    """
+def send_email(to_email: str, subject: str, message: str):
 
-    print("------ EMAIL SENT ------")
-    print(f"To: {email}")
-    print(message)
-    print("------------------------")
+    if not RESEND_API_KEY:
+        print(" Missing RESEND_API_KEY")
+        return
+
+    url = "https://api.resend.com/emails"
+
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "from": "onboarding@resend.dev",
+        "to": [to_email],
+        "subject": subject,
+        "html": f"<p>{message}</p>",
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        print(" Email sent:", response.json())
+    except Exception as e:
+        print(" Email error:", e)

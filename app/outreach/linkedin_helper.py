@@ -1,33 +1,33 @@
-# app/outreach/linkedin_helper.py
-
-from app.outreach.agent import generate_initial_message, generate_link
+from app.outreach.agent import generate_link, generate_initial_message
 
 
 def generate_linkedin_messages(leads):
     """
-    Generates copy-paste LinkedIn messages
+    Generate outreach messages for LinkedIn manually
     """
 
     results = []
 
     for lead in leads:
         link = generate_link(lead["role"])
-        message = generate_initial_message(lead, link)
 
-        results.append({"name": lead["name"], "message": message.strip()})
+        message = generate_initial_message(lead["name"], lead["role"], link)
+
+        results.append({"name": lead["name"], "role": lead["role"], "message": message})
 
     return results
 
 
+# 🔥 TEST BLOCK
 if __name__ == "__main__":
     leads = [
         {"name": "Sarah", "role": "AI Hiring Manager"},
         {"name": "David", "role": "Technical Recruiter"},
     ]
 
-    messages = generate_linkedin_messages(leads)
+    results = generate_linkedin_messages(leads)
 
-    for m in messages:
+    for r in results:
         print("------")
-        print(m["name"])
-        print(m["message"])
+        print(f"To: {r['name']} ({r['role']})\n")
+        print(r["message"])

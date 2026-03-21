@@ -3,11 +3,14 @@ from pydantic import BaseModel
 from uuid import uuid4
 
 from app.agents.automation_agent import automation_agent
-from app.db.memory import create_user, USER_DB
+from app.db.memory import create_user, get_user, update_user, USER_DB
 
 router = APIRouter()
 
 
+# -----------------------------
+# MODELS
+# -----------------------------
 class InitRequest(BaseModel):
     source: str | None = None
     persona: str | None = None
@@ -19,8 +22,17 @@ class AgentRequest(BaseModel):
     user_id: str
 
 
+class EmailCaptureRequest(BaseModel):
+    user_id: str
+    email: str
+
+
+# -----------------------------
+# INIT USER
+# -----------------------------
 @router.post("/init")
 def init_user(req: InitRequest):
+
     user_id = str(uuid4())
 
     create_user(
@@ -35,12 +47,33 @@ def init_user(req: InitRequest):
     return {"user_id": user_id}
 
 
+# -----------------------------
+# AGENT
+# -----------------------------
 @router.post("/automate")
 def automate(request: AgentRequest):
     return automation_agent(request.user_id, request.message)
 
 
-#  NEW: DASHBOARD ENDPOINT
+# -----------------------------
+# CAPTURE EMAIL
+# -----------------------------
+@router.post("/capture-email")
+def capture_email(req: EmailCaptureRequest):
+
+    user = get_user(req.user_id)
+
+    if not user:
+        return {"status": "error", "message": "User not found"}
+
+    update_user(req.user_id, "email", req.email)
+
+    return {"status": "success"}
+
+
+# -----------------------------
+# DASHBOARD
+# -----------------------------
 @router.get("/dashboard")
 def dashboard():
     return {"total_users": len(USER_DB), "users": list(USER_DB.values())}
