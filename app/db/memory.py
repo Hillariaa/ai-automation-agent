@@ -19,8 +19,10 @@ def create_user(user_id: str, context: dict):
         "last_active": datetime.utcnow(),
         "created_at": datetime.utcnow(),
         "is_high_intent": False,
-        #  TEMP TEST EMAIL
+        # TEMP TEST EMAIL
         "email": "your_email@example.com",
+        # (SAFETY)
+        "feedback": [],
     }
     return USER_DB[user_id]
 
@@ -30,7 +32,7 @@ def update_user(user_id: str, key: str, value):
         USER_DB[user_id][key] = value
 
 
-#  NEW: detect intent
+# NEW: detect intent
 def update_intent(user_id: str):
     user = USER_DB.get(user_id)
 
@@ -39,3 +41,13 @@ def update_intent(user_id: str):
 
     if len(user["progress"]) >= 2:
         user["is_high_intent"] = True
+
+
+# FEEDBACK (SAFE FUNCTION)
+def add_feedback(user_id: str, message: str):
+    user = USER_DB.get(user_id)
+
+    if not user:
+        return
+
+    user["feedback"].append({"message": message, "timestamp": datetime.utcnow()})

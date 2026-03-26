@@ -4,7 +4,7 @@ from langgraph.graph import StateGraph, END
 from app.tools.outreach_tools import portfolio_response
 
 
-# ✅ Proper state typing
+#  Proper state typing
 class AgentState(TypedDict):
     message: str
     response: str
